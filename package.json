@@ -1,0 +1,22 @@
+{
+  "name": "identityos",
+  "version": "1.0.0",
+  "private": true,
+  "description": "IdentityOS monorepo",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "npm run dev -w apps/identity-api",
+    "build": "npm run build -w apps/identity-api",
+    "start": "npm run start -w apps/identity-api",
+    "lint": "npm run lint -w apps/identity-api",
+    "prisma:generate": "npm run prisma:generate -w apps/identity-api",
+    "prisma:migrate": "npm run prisma:migrate -w apps/identity-api",
+    "prisma:seed": "npm run prisma:seed -w apps/identity-api"
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  }
+}

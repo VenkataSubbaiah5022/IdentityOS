@@ -1,0 +1,163 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum RoleName {
+  USER
+  ADMIN
+  MODERATOR
+  SUPER_ADMIN
+}
+
+enum AuditAction {
+  REGISTER
+  LOGIN
+  LOGOUT
+  PASSWORD_CHANGE
+  PASSWORD_RESET
+  PROFILE_UPDATE
+  APP_REGISTER
+}
+
+model User {
+  id                String         @id @default(cuid())
+  email             String         @unique
+  username          String         @unique
+  passwordHash      String
+  emailVerified     Boolean        @default(false)
+  avatar            String?
+  bio               String?
+  socialLinks       Json?
+  preferences       Json?
+  createdAt         DateTime       @default(now())
+  updatedAt         DateTime       @updatedAt
+  sessions          Session[]
+  roles             UserRole[]
+  oauthAccounts     OauthAccount[]
+  resetTokens       PasswordResetToken[]
+  emailTokens       EmailVerifyToken[]
+  auditLogs         AuditLog[]
+}
+
+model Session {
+  id              String         @id @default(cuid())
+  userId          String
+  user            User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  ipAddress       String?
+  userAgent       String?
+  expiresAt       DateTime
+  revokedAt       DateTime?
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+  refreshTokens   RefreshToken[]
+
+  @@index([userId, createdAt])
+}
+
+model RefreshToken {
+  id           String      @id @default(cuid())
+  sessionId    String
+  session      Session     @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  tokenHash    String
+  expiresAt    DateTime
+  revokedAt    DateTime?
+  createdAt    DateTime    @default(now())
+  rotatedFrom  String?
+  replacedBy   String?
+
+  @@index([sessionId, createdAt])
+}
+
+model Role {
+  id           String            @id @default(cuid())
+  name         RoleName          @unique
+  description  String?
+  users        UserRole[]
+  permissions  RolePermission[]
+}
+
+model Permission {
+  id           String            @id @default(cuid())
+  key          String            @unique
+  description  String?
+  roles        RolePermission[]
+}
+
+model UserRole {
+  userId       String
+  roleId       String
+  user         User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  role         Role              @relation(fields: [roleId], references: [id], onDelete: Cascade)
+
+  @@id([userId, roleId])
+}
+
+model RolePermission {
+  roleId        String
+  permissionId  String
+  role          Role            @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  permission    Permission      @relation(fields: [permissionId], references: [id], onDelete: Cascade)
+
+  @@id([roleId, permissionId])
+}
+
+model OauthAccount {
+  id                   String    @id @default(cuid())
+  userId               String
+  user                 User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  provider             String
+  providerAccountId    String
+  accessToken          String?
+  refreshToken         String?
+  createdAt            DateTime  @default(now())
+  updatedAt            DateTime  @updatedAt
+
+  @@unique([provider, providerAccountId])
+}
+
+model AppClient {
+  id                   String    @id @default(cuid())
+  name                 String
+  clientId             String    @unique
+  clientSecretHash     String
+  callbackUrls         String[]
+  createdAt            DateTime  @default(now())
+  updatedAt            DateTime  @updatedAt
+}
+
+model PasswordResetToken {
+  id          String    @id @default(cuid())
+  userId      String
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tokenHash   String
+  expiresAt   DateTime
+  usedAt      DateTime?
+  createdAt   DateTime  @default(now())
+}
+
+model EmailVerifyToken {
+  id          String    @id @default(cuid())
+  userId      String
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tokenHash   String
+  expiresAt   DateTime
+  usedAt      DateTime?
+  createdAt   DateTime  @default(now())
+}
+
+model AuditLog {
+  id          String      @id @default(cuid())
+  userId      String?
+  user        User?       @relation(fields: [userId], references: [id], onDelete: SetNull)
+  action      AuditAction
+  ipAddress   String?
+  metadata    Json?
+  createdAt   DateTime    @default(now())
+
+  @@index([createdAt])
+}
