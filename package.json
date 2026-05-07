@@ -9,9 +9,13 @@
   ],
   "scripts": {
     "dev": "npm run dev -w apps/identity-api",
+    "dev:admin": "npm run dev -w apps/admin-web",
+    "dev:all": "npm run dev -w apps/identity-api && npm run dev -w apps/admin-web",
     "build": "npm run build -w apps/identity-api",
+    "build:admin": "npm run build -w apps/admin-web",
     "start": "npm run start -w apps/identity-api",
     "lint": "npm run lint -w apps/identity-api",
+    "lint:all": "npm run lint -w apps/identity-api && npm run lint -w apps/admin-web",
     "prisma:generate": "npm run prisma:generate -w apps/identity-api",
     "prisma:migrate": "npm run prisma:migrate -w apps/identity-api",
     "prisma:seed": "npm run prisma:seed -w apps/identity-api"

@@ -4,7 +4,7 @@
 - Implemented register/login/logout/refresh with rotating refresh tokens.
 
 ## Phase 3
-- Added forgot-password and reset-password token flow.
+- Added forgot-password/reset-password token flow and email verification endpoints.
 
 ## Phase 4
 - Added auth and RBAC middleware, role management endpoints, and protected user APIs.
@@ -13,16 +13,16 @@
 - Added session listing and revoke endpoints.
 
 ## Phase 6
-- Added OAuth state generation/validation and provider redirect endpoints.
+- Added OAuth code exchange for Google/GitHub and account linking/login session issuance.
 
 ## Phase 7
 - Added app registry APIs and access token introspection endpoint.
 
 ## Phase 8
-- Added baseline security middleware: helmet, CORS policy, global rate limit, secure refresh cookie, and audit event writes.
+- Added baseline security middleware: helmet, CORS policy, global rate limit, secure refresh cookie, audit event writes, CSRF checks, and login brute-force protection.
 
 ## Phase 9
-- Reserved `apps/admin-web` for admin panel implementation.
+- Implemented `apps/admin-web` with users/logs/apps/sessions dashboards and OAuth handoff support.
 
 ## Phase 10
-- Added API Dockerfile and production compose baseline for deployment.
+- Added API Dockerfile, production compose baseline, readiness endpoint, request logging, and graceful shutdown wiring.

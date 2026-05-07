@@ -15,12 +15,23 @@ Centralized authentication and identity management platform for all internal app
    - `npm run prisma:seed`
 5. Start API:
    - `npm run dev`
+6. Start Admin UI:
+   - `npm run dev:admin`
 
 ## Monorepo
 
 - `apps/identity-api`: Express + Prisma API
-- `apps/admin-web`: future admin UI
+- `apps/admin-web`: Vite + React admin UI
 - `packages/contracts`: Zod schemas and shared contracts
 - `packages/security`: password + token utilities
 - `infra/docker`: local postgres + redis
 - `docs`: architecture and phase notes
+
+## Security Features Included
+
+- Rotating refresh tokens with revocation
+- Email verification and password reset one-time tokens
+- OAuth (Google and GitHub) with state validation
+- Login brute-force throttling (Redis-backed)
+- CSRF token requirement for cookie-authenticated refresh/logout
+- Audit logging and readiness checks (`/ready`)

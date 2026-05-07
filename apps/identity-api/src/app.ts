@@ -4,19 +4,23 @@ import express from "express";
 import helmet from "helmet";
 import rateLimit from "express-rate-limit";
 import { env } from "./config/env";
+import { prisma } from "./lib/prisma";
+import { redis } from "./lib/redis";
 import { authRouter } from "./modules/auth/routes";
 import { usersRouter } from "./modules/users/routes";
 import { sessionsRouter } from "./modules/sessions/routes";
 import { rolesRouter } from "./modules/roles/routes";
 import { appRegistryRouter } from "./modules/apps/routes";
 import { adminRouter } from "./modules/admin/routes";
+import { requestLogger } from "./middleware/request-log";
 
 export const app = express();
 
 app.use(helmet());
+app.use(requestLogger);
 app.use(
   cors({
-    origin: env.frontendOrigin,
+    origin: [env.frontendOrigin, env.adminWebOrigin],
     credentials: true,
   }),
 );
@@ -32,6 +36,16 @@ app.use(
 
 app.get("/health", (_req, res) => {
   res.json({ ok: true, service: "IdentityOS", env: env.nodeEnv });
+});
+
+app.get("/ready", async (_req, res) => {
+  try {
+    await prisma.$queryRaw`SELECT 1`;
+    await redis.ping();
+    res.json({ ok: true });
+  } catch {
+    res.status(503).json({ ok: false });
+  }
 });
 
 app.use("/auth", authRouter);
